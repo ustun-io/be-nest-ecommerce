@@ -1,0 +1,32 @@
+version: '3'
+
+# ${variable} variable values can be found in .env
+services:
+  # Database layer
+  db:
+    container_name:         ${MYSQL_DOCKER_NAME}
+    image:                  ${MYSQL_DOCKER_IMAGE}
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_USER:           ${DB_USER}
+      MYSQL_PASSWORD:       ${DB_PASSWORD}
+      MYSQL_DATABASE:       ${DB_NAME}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - './docker/db/data:/var/lib/mysql'
+      - './docker/db/my.cnf:/etc/mysql/conf.d/my.cnf'
+      - './docker/db/sql:/docker-entrypoint-initdb.d'
+  adminer:
+    container_name: ${ADMINER_DOCKER_NAME}
+    image:          ${ADMINER_DOCKER_IMAGE}
+    restart:        always
+    environment:
+      MEMORY:       ${ADMINER_MEMORY}
+      UPLOAD:       ${ADMINER_UPLOAD}
+    ports:
+      - ${ADMINER_PORT}
+networks:
+  db:
+    driver: bridge
